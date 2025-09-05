@@ -3,5 +3,13 @@ name = "brainfuck-lamina"
 version = "0.1.0"
 edition = "2024"
 
+[lib]
+name = "brainfuck_lamina"
+path = "src/lib.rs"
+
+[[bin]]
+name = "brainfuck-lamina"
+path = "src/main.rs"
+
 [dependencies]
-lamina = "0.0.1"
+lamina = "0.0.2"
