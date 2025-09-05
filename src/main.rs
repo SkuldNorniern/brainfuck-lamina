@@ -1,7 +1,8 @@
-use brainfuck_lamina::{parse_brainfuck, AstNode, Command};
+use brainfuck_lamina::{parse_brainfuck, AstNode, Command, brainfuck_to_lamina_ir, brainfuck_to_assembly, brainfuck_to_binary, brainfuck_to_ir_description};
 use std::env;
 use std::fs;
 use std::process;
+use std::path::Path;
 
 /// Print the AST in a human-readable format
 fn print_ast(nodes: &[AstNode], indent: usize) {
@@ -37,6 +38,38 @@ fn format_command(cmd: Command) -> &'static str {
 fn print_usage() {
     eprintln!("Usage: brainfuck-lamina <filename>");
     eprintln!("  filename: Path to Brainfuck (.bf or .b) source file");
+}
+
+/// Generate the output filename for the .lamina file
+fn generate_lamina_filename(input_filename: &str) -> String {
+    let path = Path::new(input_filename);
+    let stem = path.file_stem().unwrap_or_default().to_string_lossy();
+    let parent = path.parent().unwrap_or(Path::new(""));
+    
+    if parent.to_string_lossy().is_empty() {
+        format!("{}.lamina", stem)
+    } else {
+        format!("{}/{}.lamina", parent.display(), stem)
+    }
+}
+
+/// Generate the output filename for the binary executable
+fn generate_binary_filename(input_filename: &str) -> String {
+    let path = Path::new(input_filename);
+    let stem = path.file_stem().unwrap_or_default().to_string_lossy();
+    let parent = path.parent().unwrap_or(Path::new(""));
+    
+    let binary_name = if cfg!(windows) {
+        format!("{}.exe", stem)
+    } else {
+        stem.to_string()
+    };
+    
+    if parent.to_string_lossy().is_empty() {
+        binary_name
+    } else {
+        format!("{}/{}", parent.display(), binary_name)
+    }
 }
 
 fn main() {
@@ -78,7 +111,74 @@ fn main() {
     let (command_count, loop_count) = count_nodes(&ast);
     println!("========================================");
     println!("Summary: {} commands, {} loops", command_count, loop_count);
+
+    // Generate Lamina IR Module
+    println!("\n🔄 Lamina IR Generation");
+    println!("========================================");
+
+    match brainfuck_to_lamina_ir(&ast) {
+        Ok(ir_description) => {
+            println!("✅ Lamina IR Module Generated Successfully!");
+            println!("{}", ir_description);
+            
+            // Save the IR to a .lamina file
+            let lamina_filename = generate_lamina_filename(filename);
+            match fs::write(&lamina_filename, &ir_description) {
+                Ok(_) => {
+                    println!("\n💾 Lamina IR saved to: {}", lamina_filename);
+                }
+                Err(err) => {
+                    println!("\n❌ Failed to save Lamina IR to {}: {}", lamina_filename, err);
+                }
+            }
+        }
+        Err(err) => {
+            println!("❌ IR Generation Failed: {}", err);
+        }
+    }
+
+    // Generate assembly code
+    println!("\n🔄 Assembly Code Generation");
+    println!("========================================");
+    
+    match brainfuck_to_assembly(&ast) {
+        Ok(assembly) => {
+            println!("✅ Assembly Code Generated Successfully!");
+            println!("\nGenerated Assembly:");
+            println!("{}", assembly);
+        }
+        Err(err) => {
+            println!("❌ Assembly Generation Failed: {}", err);
+        }
+    }
+
+    // Generate binary executable
+    println!("\n🔄 Binary Executable Generation");
+    println!("========================================");
+    
+    let binary_filename = generate_binary_filename(filename);
+    match brainfuck_to_binary(&ast, &binary_filename) {
+        Ok(result) => {
+            println!("✅ {}", result);
+        }
+        Err(err) => {
+            println!("❌ Binary Generation Failed: {}", err);
+        }
+    }
+
+    // Also show detailed description
+    println!("\n📋 Detailed IR Description");
+    println!("========================================");
+    match brainfuck_to_ir_description(&ast) {
+        Ok(description) => {
+            println!("{}", description);
+        }
+        Err(err) => {
+            println!("❌ Description Generation Failed: {}", err);
+        }
+    }
 }
+
 
 /// Count the total number of commands and loops in the AST
 fn count_nodes(nodes: &[AstNode]) -> (usize, usize) {
