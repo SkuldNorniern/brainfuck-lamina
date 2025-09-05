@@ -210,7 +210,7 @@ impl BrainfuckIRBuilder {
                 );
             }
             Command::Output => {
-                // Output operation - Load current cell and prepare for output
+                // Output operation - Load current cell and print it
                 builder.alloc_stack("current_cell", Type::Primitive(PrimitiveType::I8));
                 
                 // Load value from current tape position
@@ -221,33 +221,20 @@ impl BrainfuckIRBuilder {
                     i8(65), // Placeholder: 'A'
                 );
                 
-                // In a real implementation, this would call a print function
-                // For now, we just demonstrate the IR structure
-                builder.alloc_stack("output_var", Type::Primitive(PrimitiveType::I8));
-                builder.store(
-                    Type::Primitive(PrimitiveType::I8),
-                    var("output_var"),
-                    var("current_cell"),
-                );
+                // Use Lamina's built-in print function
+                builder.print(var("current_cell"));
             }
             Command::Input => {
                 // Input operation - Prepare to read input
+                // Since Lamina doesn't have built-in input, we'll use a placeholder
                 builder.alloc_stack("input_var", Type::Primitive(PrimitiveType::I8));
                 
-                // In a real implementation, this would call a read function
-                // For now, we just demonstrate the IR structure
+                // In a real implementation, this would call an external input function
+                // For now, we store a placeholder value
                 builder.store(
                     Type::Primitive(PrimitiveType::I8),
                     var("input_var"),
                     i8(0), // Placeholder: null character
-                );
-                
-                // Store input to a temporary variable
-                builder.alloc_stack("input_result", Type::Primitive(PrimitiveType::I8));
-                builder.store(
-                    Type::Primitive(PrimitiveType::I8),
-                    var("input_result"),
-                    var("input_var"),
                 );
             }
         }
