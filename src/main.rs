@@ -1,4 +1,4 @@
-use brainfuck_lamina::{parse_brainfuck, AstNode, Command, brainfuck_to_lamina_ir, brainfuck_to_assembly, brainfuck_to_binary, brainfuck_to_ir_description};
+use brainfuck_lamina::{parse_brainfuck, AstNode, Command, brainfuck_to_lamina_ir, brainfuck_to_binary, brainfuck_to_ir_description};
 use std::env;
 use std::fs;
 use std::process;
@@ -116,53 +116,57 @@ fn main() {
     println!("\n🔄 Lamina IR Generation");
     println!("========================================");
 
+    let lamina_filename = generate_lamina_filename(filename);
+    println!("Debug: Generated filename: '{}'", lamina_filename);
+
+    // Generate and save Lamina IR to file first
+    println!("Debug: About to call brainfuck_to_lamina_ir");
     match brainfuck_to_lamina_ir(&ast) {
-        Ok(ir_description) => {
-            println!("✅ Lamina IR Module Generated Successfully!");
-            println!("{}", ir_description);
-            
-            // Save the IR to a .lamina file
-            let lamina_filename = generate_lamina_filename(filename);
-            match fs::write(&lamina_filename, &ir_description) {
+        Ok(ir_source) => {
+            println!("Debug: IR generation succeeded, IR length: {}", ir_source.len());
+            println!("Debug: Target filename: {}", lamina_filename);
+            println!("Debug: About to write {} bytes to file", ir_source.len());
+            println!("Debug: First 200 chars of IR: {}", &ir_source[..200.min(ir_source.len())]);
+            println!("\n=== FULL IR START ===");
+            println!("{}", ir_source);
+            println!("=== FULL IR END ===\n");
+            match fs::write(&lamina_filename, &ir_source) {
                 Ok(_) => {
-                    println!("\n💾 Lamina IR saved to: {}", lamina_filename);
+                    println!("✅ Lamina IR saved to: {}", lamina_filename);
+                    // Verify the file was actually created
+                    match fs::metadata(&lamina_filename) {
+                        Ok(metadata) => {
+                            println!("Debug: File created successfully, size: {} bytes", metadata.len());
+                        }
+                        Err(err) => {
+                            println!("Debug: File metadata check failed: {}", err);
+                        }
+                    }
                 }
                 Err(err) => {
-                    println!("\n❌ Failed to save Lamina IR to {}: {}", lamina_filename, err);
+                    println!("❌ Failed to save Lamina IR: {}", err);
+                    println!("Debug: Error details: {:?}", err);
                 }
             }
         }
         Err(err) => {
-            println!("❌ IR Generation Failed: {}", err);
+            println!("❌ Lamina IR Generation Failed: {}", err);
         }
     }
 
-    // Generate assembly code
-    println!("\n🔄 Assembly Code Generation");
+    // Generate executable using Lamina toolchain
+    println!("\n🔄 Executable Generation");
     println!("========================================");
-    
-    match brainfuck_to_assembly(&ast) {
-        Ok(assembly) => {
-            println!("✅ Assembly Code Generated Successfully!");
-            println!("\nGenerated Assembly:");
-            println!("{}", assembly);
-        }
-        Err(err) => {
-            println!("❌ Assembly Generation Failed: {}", err);
-        }
-    }
 
-    // Generate binary executable
-    println!("\n🔄 Binary Executable Generation");
-    println!("========================================");
-    
     let binary_filename = generate_binary_filename(filename);
     match brainfuck_to_binary(&ast, &binary_filename) {
         Ok(result) => {
             println!("✅ {}", result);
         }
         Err(err) => {
-            println!("❌ Binary Generation Failed: {}", err);
+            println!("❌ Executable Generation Failed: {}", err);
+            println!("💡 Lamina IR is saved at: {}", lamina_filename);
+            println!("💡 Try manual compilation: lamina {} -o {}", lamina_filename, binary_filename);
         }
     }
 
