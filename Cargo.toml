@@ -12,4 +12,4 @@ name = "brainfuck-lamina"
 path = "src/main.rs"
 
 [dependencies]
-lamina = "0.0.2"
+lamina = "0.0.4"
