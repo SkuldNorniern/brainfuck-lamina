@@ -127,9 +127,7 @@ fn main() {
             println!("Debug: Target filename: {}", lamina_filename);
             println!("Debug: About to write {} bytes to file", ir_source.len());
             println!("Debug: First 200 chars of IR: {}", &ir_source[..200.min(ir_source.len())]);
-            println!("\n=== FULL IR START ===");
-            println!("{}", ir_source);
-            println!("=== FULL IR END ===\n");
+            println!("Debug: Attempting to write to: {}", lamina_filename);
             match fs::write(&lamina_filename, &ir_source) {
                 Ok(_) => {
                     println!("✅ Lamina IR saved to: {}", lamina_filename);
