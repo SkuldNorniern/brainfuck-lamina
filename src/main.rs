@@ -2,7 +2,7 @@ use brainfuck_lamina::{parse_brainfuck, AstNode, Command, brainfuck_to_lamina_ir
 use std::env;
 use std::fs;
 use std::process;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 /// Print the AST in a human-readable format
 fn print_ast(nodes: &[AstNode], indent: usize) {
@@ -44,12 +44,17 @@ fn print_usage() {
 fn generate_lamina_filename(input_filename: &str) -> String {
     let path = Path::new(input_filename);
     let stem = path.file_stem().unwrap_or_default().to_string_lossy();
-    let parent = path.parent().unwrap_or(Path::new(""));
-    
-    if parent.to_string_lossy().is_empty() {
-        format!("{}.lamina", stem)
-    } else {
-        format!("{}/{}.lamina", parent.display(), stem)
+    let parent = path.parent();
+
+    match parent {
+        Some(parent_path) if !parent_path.as_os_str().is_empty() => {
+            format!("{}/{}.lamina", parent_path.display(), stem)
+        }
+        _ => {
+            // File is in current directory - use absolute path
+            let current_dir = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
+            format!("{}/{}.lamina", current_dir.display(), stem)
+        }
     }
 }
 
@@ -117,33 +122,16 @@ fn main() {
     println!("========================================");
 
     let lamina_filename = generate_lamina_filename(filename);
-    println!("Debug: Generated filename: '{}'", lamina_filename);
 
     // Generate and save Lamina IR to file first
-    println!("Debug: About to call brainfuck_to_lamina_ir");
     match brainfuck_to_lamina_ir(&ast) {
         Ok(ir_source) => {
-            println!("Debug: IR generation succeeded, IR length: {}", ir_source.len());
-            println!("Debug: Target filename: {}", lamina_filename);
-            println!("Debug: About to write {} bytes to file", ir_source.len());
-            println!("Debug: First 200 chars of IR: {}", &ir_source[..200.min(ir_source.len())]);
-            println!("Debug: Attempting to write to: {}", lamina_filename);
             match fs::write(&lamina_filename, &ir_source) {
                 Ok(_) => {
                     println!("✅ Lamina IR saved to: {}", lamina_filename);
-                    // Verify the file was actually created
-                    match fs::metadata(&lamina_filename) {
-                        Ok(metadata) => {
-                            println!("Debug: File created successfully, size: {} bytes", metadata.len());
-                        }
-                        Err(err) => {
-                            println!("Debug: File metadata check failed: {}", err);
-                        }
-                    }
                 }
                 Err(err) => {
                     println!("❌ Failed to save Lamina IR: {}", err);
-                    println!("Debug: Error details: {:?}", err);
                 }
             }
         }
