@@ -1,4 +1,4 @@
-use brainfuck_lamina::{parse_brainfuck, AstNode, Command, brainfuck_to_lamina_ir, brainfuck_to_binary, brainfuck_to_ir_description};
+use brainfuck_lamina::{parse_brainfuck, AstNode, Command, brainfuck_to_lamina_ir, brainfuck_to_binary, brainfuck_to_ir_description, lamina_builder::utils::count_operations};
 use std::env;
 use std::fs;
 use std::process;
@@ -113,7 +113,7 @@ fn main() {
     print_ast(&ast, 0);
 
     // Print summary statistics
-    let (command_count, loop_count) = count_nodes(&ast);
+    let (command_count, loop_count) = count_operations(&ast);
     println!("========================================");
     println!("Summary: {} commands, {} loops", command_count, loop_count);
 
@@ -170,22 +170,3 @@ fn main() {
 }
 
 
-/// Count the total number of commands and loops in the AST
-fn count_nodes(nodes: &[AstNode]) -> (usize, usize) {
-    let mut commands = 0;
-    let mut loops = 0;
-
-    for node in nodes {
-        match node {
-            AstNode::Command(_) => commands += 1,
-            AstNode::Loop(body) => {
-                loops += 1;
-                let (sub_commands, sub_loops) = count_nodes(body);
-                commands += sub_commands;
-                loops += sub_loops;
-            }
-        }
-    }
-
-    (commands, loops)
-}
