@@ -18,6 +18,6 @@ pub use compiler::{
     brainfuck_to_assembly_with_config,
     brainfuck_to_binary,
     brainfuck_to_binary_with_config,
-    brainfuck_to_ir_description,
 };
+
 

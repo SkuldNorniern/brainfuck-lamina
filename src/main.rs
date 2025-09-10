@@ -1,4 +1,4 @@
-use brainfuck_lamina::{parse_brainfuck, AstNode, Command, brainfuck_to_lamina_ir, brainfuck_to_binary, brainfuck_to_ir_description, lamina_builder::utils::count_operations};
+use brainfuck_lamina::{parse_brainfuck, AstNode, Command, brainfuck_to_lamina_ir, brainfuck_to_binary, lamina_builder::utils::count_operations};
 use std::env;
 use std::fs;
 use std::process;
@@ -107,19 +107,9 @@ fn main() {
         }
     };
 
-    // Print the AST
-    println!("Brainfuck AST for '{}':", filename);
-    println!("========================================");
-    print_ast(&ast, 0);
-
-    // Print summary statistics
-    let (command_count, loop_count) = count_operations(&ast);
-    println!("========================================");
-    println!("Summary: {} commands, {} loops", command_count, loop_count);
+    
 
     // Generate Lamina IR Module
-    println!("\n🔄 Lamina IR Generation");
-    println!("========================================");
 
     let lamina_filename = generate_lamina_filename(filename);
 
@@ -128,45 +118,32 @@ fn main() {
         Ok(ir_source) => {
             match fs::write(&lamina_filename, &ir_source) {
                 Ok(_) => {
-                    println!("✅ Lamina IR saved to: {}", lamina_filename);
+                    //println!("Lamina IR saved to: {}", lamina_filename);
                 }
                 Err(err) => {
-                    println!("❌ Failed to save Lamina IR: {}", err);
+                    println!("Failed to save Lamina IR: {}", err);
                 }
             }
         }
         Err(err) => {
-            println!("❌ Lamina IR Generation Failed: {}", err);
+            println!("Lamina IR Generation Failed: {}", err);
         }
     }
 
     // Generate executable using Lamina toolchain
-    println!("\n🔄 Executable Generation");
-    println!("========================================");
-
     let binary_filename = generate_binary_filename(filename);
     match brainfuck_to_binary(&ast, &binary_filename) {
         Ok(result) => {
-            println!("✅ {}", result);
+            println!("{}", result);
         }
         Err(err) => {
-            println!("❌ Executable Generation Failed: {}", err);
-            println!("💡 Lamina IR is saved at: {}", lamina_filename);
-            println!("💡 Try manual compilation: lamina {} -o {}", lamina_filename, binary_filename);
+            println!("Executable Generation Failed: {}", err);
+            println!("Lamina IR is saved at: {}", lamina_filename);
+            println!("Try manual compilation: lamina {} -o {}", lamina_filename, binary_filename);
         }
     }
 
-    // Also show detailed description
-    println!("\n📋 Detailed IR Description");
-    println!("========================================");
-    match brainfuck_to_ir_description(&ast) {
-        Ok(description) => {
-            println!("{}", description);
-        }
-        Err(err) => {
-            println!("❌ Description Generation Failed: {}", err);
-        }
-    }
+
 }
 
 

@@ -176,35 +176,5 @@ fn compile_with_lamina_library(ir_source: &str, output_name: &str) -> Result<(),
     }
 }
 
-/// Generate a description of the IR that would be generated
-pub fn brainfuck_to_ir_description(ast: &[AstNode]) -> Result<String, String> {
-    let mut description = String::new();
-    description.push_str("✅ Lamina IR Module Generated Successfully!\n");
-    description.push_str("========================================\n\n");
 
-    description.push_str("Module Structure:\n");
-    description.push_str("- Main function: void main()\n");
-    description.push_str("- Memory tape: heap-allocated array of 1,000 i8 values\n");
-    description.push_str("- Data pointer: i32 index into tape\n");
-    description.push_str("- I/O: Uses Lamina's writebyte/readbyte instructions\n\n");
-
-    let (cmd_count, loop_count) = count_operations(ast);
-    description.push_str(&format!("Operations to convert:\n"));
-    description.push_str(&format!("- {} basic commands\n", cmd_count));
-    description.push_str(&format!("- {} loops\n\n", loop_count));
-
-    description.push_str("Memory Layout:\n");
-    description.push_str("- tape: heap-allocated 1,000 i8 array (1,000 bytes)\n");
-    description.push_str("- data_ptr: i32 variable tracking current position (0-999)\n");
-    description.push_str("- temp variables: Generated as needed for operations\n\n");
-
-    description.push_str("I/O Operations:\n");
-    description.push_str("- Output: writebyte instruction writes i32 values to stdout\n");
-    description.push_str("- Input: readbyte instruction reads i32 values from stdin\n\n");
-
-    description.push_str("✅ Complete Brainfuck to Lamina IR conversion ready!\n");
-    description.push_str("   All operations properly mapped to Lamina IR instructions.\n");
-
-    Ok(description)
-}
 
