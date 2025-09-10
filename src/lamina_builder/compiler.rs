@@ -207,3 +207,4 @@ pub fn brainfuck_to_ir_description(ast: &[AstNode]) -> Result<String, String> {
 
     Ok(description)
 }
+

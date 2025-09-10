@@ -50,11 +50,19 @@ impl BrainfuckIRBuilder {
         // Generate IR that outputs each byte of the computed result
         for &byte in output.iter() {
             // Create a variable for this output byte
+            // Handle unsigned byte values correctly by using the raw byte value
+            let byte_value = if byte < 128 {
+                byte as i8
+            } else {
+                // For values >= 128, we need to represent them as negative i8 values
+                // This is correct because Brainfuck uses 8-bit unsigned arithmetic
+                byte as i8
+            };
             builder.binary(
                 BinaryOp::Add,
                 "output_val",
                 PrimitiveType::I8,
-                i8(byte as i8),
+                i8(byte_value),
                 i8(0),
             );
             builder.write_byte(var("output_val"), "write_result");
