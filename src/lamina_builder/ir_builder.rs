@@ -3,10 +3,10 @@
 //! This module handles the conversion of Brainfuck AST to Lamina IR
 //! and provides methods to generate assembly code.
 
-use lamina::ir::*;
-use lamina::ir::builder::{i8, var};
-use crate::lexer::{AstNode, Command};
 use super::config::BrainfuckConfig;
+use crate::lexer::{AstNode, Command};
+use lamina::ir::builder::{i8, var};
+use lamina::ir::*;
 
 /// Brainfuck to Lamina IR Builder
 ///
@@ -18,6 +18,12 @@ use super::config::BrainfuckConfig;
 #[allow(dead_code)]
 pub struct BrainfuckIRBuilder {
     config: BrainfuckConfig,
+}
+
+impl Default for BrainfuckIRBuilder {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl BrainfuckIRBuilder {
@@ -89,7 +95,13 @@ impl BrainfuckIRBuilder {
     }
 
     /// Recursively interpret AST nodes with proper loop handling
-    fn interpret_ast(&self, ast: &[AstNode], tape: &mut Vec<u8>, ptr: &mut usize, output: &mut Vec<u8>) -> Result<(), String> {
+    fn interpret_ast(
+        &self,
+        ast: &[AstNode],
+        tape: &mut Vec<u8>,
+        ptr: &mut usize,
+        output: &mut Vec<u8>,
+    ) -> Result<(), String> {
         for node in ast {
             match node {
                 AstNode::Command(cmd) => {
@@ -104,7 +116,13 @@ impl BrainfuckIRBuilder {
     }
 
     /// Interpret a single command
-    fn interpret_command(&self, cmd: Command, tape: &mut Vec<u8>, ptr: &mut usize, output: &mut Vec<u8>) -> Result<(), String> {
+    fn interpret_command(
+        &self,
+        cmd: Command,
+        tape: &mut [u8],
+        ptr: &mut usize,
+        output: &mut Vec<u8>,
+    ) -> Result<(), String> {
         match cmd {
             Command::Right => {
                 *ptr = (*ptr + 1).min(tape.len() - 1);
@@ -130,13 +148,17 @@ impl BrainfuckIRBuilder {
     }
 
     /// Interpret a loop with proper conditional execution
-    fn interpret_loop(&self, body: &[AstNode], tape: &mut Vec<u8>, ptr: &mut usize, output: &mut Vec<u8>) -> Result<(), String> {
+    fn interpret_loop(
+        &self,
+        body: &[AstNode],
+        tape: &mut Vec<u8>,
+        ptr: &mut usize,
+        output: &mut Vec<u8>,
+    ) -> Result<(), String> {
         // Keep executing the loop body while the current cell is non-zero
         while tape[*ptr] != 0 {
             self.interpret_ast(body, tape, ptr, output)?;
         }
         Ok(())
     }
-
-
 }

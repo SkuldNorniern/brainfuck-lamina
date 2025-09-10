@@ -12,8 +12,8 @@ pub struct BrainfuckConfig {
 impl Default for BrainfuckConfig {
     fn default() -> Self {
         Self {
-            tape_size: 30000,   // normal brainfuck tape size
-            cell_size: 1,      // 8-bit cells
+            tape_size: 30000, // normal brainfuck tape size
+            cell_size: 1,     // 8-bit cells
         }
     }
 }
@@ -43,4 +43,3 @@ impl BrainfuckConfig {
         }
     }
 }
-

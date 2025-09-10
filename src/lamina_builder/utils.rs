@@ -21,5 +21,3 @@ pub fn count_operations(ast: &[AstNode]) -> (usize, usize) {
 
     (commands, loops)
 }
-
-

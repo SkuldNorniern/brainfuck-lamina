@@ -1,9 +1,8 @@
 //! Compiler functions for converting Brainfuck to various output formats
 
-use crate::lexer::AstNode;
 use super::config::BrainfuckConfig;
 use super::ir_builder::BrainfuckIRBuilder;
-use super::utils::count_operations;
+use crate::lexer::AstNode;
 
 /// Convert Brainfuck AST to Lamina IR
 pub fn brainfuck_to_lamina_ir(ast: &[AstNode]) -> Result<String, String> {
@@ -13,7 +12,10 @@ pub fn brainfuck_to_lamina_ir(ast: &[AstNode]) -> Result<String, String> {
 }
 
 /// Convert Brainfuck AST to Lamina IR with custom configuration
-pub fn brainfuck_to_lamina_ir_with_config(ast: &[AstNode], config: BrainfuckConfig) -> Result<String, String> {
+pub fn brainfuck_to_lamina_ir_with_config(
+    ast: &[AstNode],
+    config: BrainfuckConfig,
+) -> Result<String, String> {
     let builder = BrainfuckIRBuilder::with_config(config);
     let module = builder.build_ir(ast)?;
     Ok(module.to_string())
@@ -23,10 +25,10 @@ pub fn brainfuck_to_lamina_ir_with_config(ast: &[AstNode], config: BrainfuckConf
 pub fn brainfuck_to_assembly(ast: &[AstNode]) -> Result<String, String> {
     let builder = BrainfuckIRBuilder::new();
     let module = builder.build_ir(ast)?;
-    
+
     // Convert module to IR string
     let ir_source = module.to_string();
-    
+
     // Compile IR to assembly using Lamina
     let mut asm_buffer = Vec::new();
     match lamina::compile_lamina_ir_to_assembly(&ir_source, &mut asm_buffer) {
@@ -34,21 +36,24 @@ pub fn brainfuck_to_assembly(ast: &[AstNode]) -> Result<String, String> {
             // Convert assembly bytes to string
             match String::from_utf8(asm_buffer) {
                 Ok(assembly) => Ok(assembly),
-                Err(e) => Err(format!("Failed to convert assembly to string: {}", e))
+                Err(e) => Err(format!("Failed to convert assembly to string: {}", e)),
             }
         }
-        Err(e) => Err(format!("Lamina compilation failed: {}", e))
+        Err(e) => Err(format!("Lamina compilation failed: {}", e)),
     }
 }
 
 /// Convert Brainfuck AST to assembly code with custom configuration
-pub fn brainfuck_to_assembly_with_config(ast: &[AstNode], config: BrainfuckConfig) -> Result<String, String> {
+pub fn brainfuck_to_assembly_with_config(
+    ast: &[AstNode],
+    config: BrainfuckConfig,
+) -> Result<String, String> {
     let builder = BrainfuckIRBuilder::with_config(config);
     let module = builder.build_ir(ast)?;
-    
+
     // Convert module to IR string
     let ir_source = module.to_string();
-    
+
     // Compile IR to assembly using Lamina
     let mut asm_buffer = Vec::new();
     match lamina::compile_lamina_ir_to_assembly(&ir_source, &mut asm_buffer) {
@@ -56,10 +61,10 @@ pub fn brainfuck_to_assembly_with_config(ast: &[AstNode], config: BrainfuckConfi
             // Convert assembly bytes to string
             match String::from_utf8(asm_buffer) {
                 Ok(assembly) => Ok(assembly),
-                Err(e) => Err(format!("Failed to convert assembly to string: {}", e))
+                Err(e) => Err(format!("Failed to convert assembly to string: {}", e)),
             }
         }
-        Err(e) => Err(format!("Lamina compilation failed: {}", e))
+        Err(e) => Err(format!("Lamina compilation failed: {}", e)),
     }
 }
 
@@ -101,7 +106,11 @@ pub fn brainfuck_to_binary(ast: &[AstNode], output_path: &str) -> Result<String,
 }
 
 /// Convert Brainfuck AST to binary executable with custom configuration
-pub fn brainfuck_to_binary_with_config(ast: &[AstNode], output_path: &str, config: BrainfuckConfig) -> Result<String, String> {
+pub fn brainfuck_to_binary_with_config(
+    ast: &[AstNode],
+    output_path: &str,
+    config: BrainfuckConfig,
+) -> Result<String, String> {
     let builder = BrainfuckIRBuilder::with_config(config);
     let module = builder.build_ir(ast)?;
 
@@ -150,7 +159,8 @@ fn compile_with_lamina_library(ir_source: &str, output_name: &str) -> Result<(),
             let asm_filename = format!("{}.s", output_name);
             let mut asm_file = File::create(&asm_filename)
                 .map_err(|e| format!("Failed to create assembly file: {}", e))?;
-            asm_file.write_all(&asm_buffer)
+            asm_file
+                .write_all(&asm_buffer)
                 .map_err(|e| format!("Failed to write assembly: {}", e))?;
 
             // Use system assembler and linker to create executable
@@ -172,9 +182,6 @@ fn compile_with_lamina_library(ir_source: &str, output_name: &str) -> Result<(),
                 Err(format!("GCC compilation failed: {}", stderr))
             }
         }
-        Err(e) => Err(format!("Lamina compilation failed: {}", e))
+        Err(e) => Err(format!("Lamina compilation failed: {}", e)),
     }
 }
-
-
-

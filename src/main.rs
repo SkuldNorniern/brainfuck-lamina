@@ -1,8 +1,10 @@
-use brainfuck_lamina::{parse_brainfuck, AstNode, Command, brainfuck_to_lamina_ir, brainfuck_to_binary, lamina_builder::utils::count_operations};
+use brainfuck_lamina::{
+    AstNode, Command, brainfuck_to_binary, brainfuck_to_lamina_ir, parse_brainfuck,
+};
 use std::env;
 use std::fs;
-use std::process;
 use std::path::{Path, PathBuf};
+use std::process;
 
 /// Print the AST in a human-readable format
 fn print_ast(nodes: &[AstNode], indent: usize) {
@@ -63,13 +65,13 @@ fn generate_binary_filename(input_filename: &str) -> String {
     let path = Path::new(input_filename);
     let stem = path.file_stem().unwrap_or_default().to_string_lossy();
     let parent = path.parent().unwrap_or(Path::new(""));
-    
+
     let binary_name = if cfg!(windows) {
         format!("{}.exe", stem)
     } else {
         stem.to_string()
     };
-    
+
     if parent.to_string_lossy().is_empty() {
         binary_name
     } else {
@@ -107,8 +109,6 @@ fn main() {
         }
     };
 
-    
-
     // Generate Lamina IR Module
 
     let lamina_filename = generate_lamina_filename(filename);
@@ -139,11 +139,10 @@ fn main() {
         Err(err) => {
             println!("Executable Generation Failed: {}", err);
             println!("Lamina IR is saved at: {}", lamina_filename);
-            println!("Try manual compilation: lamina {} -o {}", lamina_filename, binary_filename);
+            println!(
+                "Try manual compilation: lamina {} -o {}",
+                lamina_filename, binary_filename
+            );
         }
     }
-
-
 }
-
-

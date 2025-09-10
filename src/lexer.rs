@@ -13,12 +13,12 @@ pub enum AstNode {
 /// Basic Brainfuck commands (excluding loop constructs)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Command {
-    Right,      // >
-    Left,       // <
-    Increment,  // +
-    Decrement,  // -
-    Output,     // .
-    Input,      // ,
+    Right,     // >
+    Left,      // <
+    Increment, // +
+    Decrement, // -
+    Output,    // .
+    Input,     // ,
 }
 
 /// Represents a position in the source code for error reporting
@@ -26,6 +26,12 @@ pub enum Command {
 pub struct Position {
     pub line: usize,
     pub column: usize,
+}
+
+impl Default for Position {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl Position {
@@ -54,10 +60,18 @@ impl std::fmt::Display for LexerError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             LexerError::UnmatchedClosingBracket(pos) => {
-                write!(f, "Unmatched closing bracket ']' at line {}, column {}", pos.line, pos.column)
+                write!(
+                    f,
+                    "Unmatched closing bracket ']' at line {}, column {}",
+                    pos.line, pos.column
+                )
             }
             LexerError::UnexpectedEndOfInput(pos) => {
-                write!(f, "Unexpected end of input while parsing loop at line {}, column {}", pos.line, pos.column)
+                write!(
+                    f,
+                    "Unexpected end of input while parsing loop at line {}, column {}",
+                    pos.line, pos.column
+                )
             }
         }
     }
@@ -229,7 +243,10 @@ mod tests {
     fn test_unmatched_closing_bracket() {
         let source = "+]";
         let result = parse_brainfuck(source);
-        assert!(matches!(result, Err(LexerError::UnmatchedClosingBracket(_))));
+        assert!(matches!(
+            result,
+            Err(LexerError::UnmatchedClosingBracket(_))
+        ));
     }
 
     #[test]
