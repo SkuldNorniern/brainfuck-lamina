@@ -1,14 +1,14 @@
 [package]
-name = "brainfuck-lamina"
+name = "bfina"
 version = "0.1.0"
 edition = "2024"
 
 [lib]
-name = "brainfuck_lamina"
+name = "bfina"
 path = "src/lib.rs"
 
 [[bin]]
-name = "brainfuck-lamina"
+name = "bfina"
 path = "src/main.rs"
 
 [dependencies]

@@ -1,4 +1,4 @@
-use brainfuck_lamina::{
+use bfina::{
     AstNode, Command, brainfuck_to_binary, brainfuck_to_lamina_ir, parse_brainfuck,
 };
 use std::env;
