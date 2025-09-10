@@ -184,21 +184,6 @@ python3 run_tests.py --compiler ./target/debug/brainfuck-lamina
 - Complex programs (hello_world, fibonacci_sequence, etc.)
 
 
-## Performance & Benchmarking
-
-The Brainfuck-Lamina compiler demonstrates significant performance advantages through compile-time optimization:
-
-### Benchmark Results Summary
-
-| Implementation | Compilation | Execution | Total | Performance |
-|----------------|-------------|-----------|-------|-------------|
-| **brainfuck-lamina** | ~0.018s | ~0.001s | ~0.019s | **Fastest** |
-| ruby | N/A | ~2.5s | ~2.5s | 130x slower |
-| python | N/A | ~1.8s | ~1.8s | 95x slower |
-| node | N/A | ~0.8s | ~0.8s | 42x slower |
-
-*Results based on test suite execution times (36 passing tests)*
-
 ### Key Performance Advantages
 
 - **Compile-Time Interpretation**: Pre-computes all output, eliminating runtime overhead
