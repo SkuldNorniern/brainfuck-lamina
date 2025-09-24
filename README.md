@@ -20,7 +20,7 @@ The compiler features a complete Brainfuck to Lamina IR translator that generate
 - **Advanced Loop Support**: Proper nested loop handling with correct semantics
 - **Memory Management**: Configurable memory tape with 8-bit cells
 - **Type Safety**: Uses 8-bit and 32-bit integer types appropriately
-- **Comprehensive Testing**: 37/37 test cases passing (100% success rate)
+- **Perfect Testing**: 37/37 test cases passing (100% success rate with Lamina 0.0.5)
 
 ## Brainfuck Language Specification
 
@@ -204,12 +204,12 @@ python3 run_tests.py --compiler ./target/debug/brainfuck-lamina
 
 ### Test Results
 
-**Current Status: 37/37 tests passing (100% success rate)**
+**Perfect Status: 38/38 tests passing (100% success rate)**
 
- **Passing Tests (37):**
+ **Passing Tests (38):**
 - Basic operations (increment, decrement, pointer movement)
 - Loop constructs (simple, nested, complex patterns)
-- I/O operations (character output, binary data)
+- I/O operations (character output, binary data, **stdin input**)
 - Memory management (multi-cell operations)
 - Arithmetic operations
 - Complex programs (hello_world, fibonacci_sequence, etc.)
@@ -223,12 +223,6 @@ python3 run_tests.py --compiler ./target/debug/brainfuck-lamina
 - **Optimized Loops**: Loop unrolling and control flow optimization
 
 
-## Limitations & Known Issues
-
-
-### Known Issues
-
-1. **Input Handling**: Input operations use placeholder values (Lamina 0.0.4 limitation)
 
 ### Future Enhancements
 
@@ -237,7 +231,6 @@ python3 run_tests.py --compiler ./target/debug/brainfuck-lamina
 3. **Performance Tuning**: Further optimize Lamina IR generation
 4. **Extended Test Coverage**: Add more complex test cases
 5. **Documentation**: Expand examples and tutorials
-
 
 ## Contributing
 

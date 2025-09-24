@@ -68,6 +68,16 @@ impl BrainfuckIRBuilder {
 
     /// Process the AST and generate IR instructions using Lamina API
     fn process_ast_with_lamina(&self, builder: &mut IRBuilder, ast: &[AstNode], memory: &mut Vec<u8>, position: &mut usize, _output_count: &mut usize) -> Result<(), String> {
+        // Initialize memory tape
+        builder.alloc_stack("tape", Type::Array {
+            element_type: Box::new(Type::Primitive(PrimitiveType::I8)),
+            size: 30000,
+        });
+
+        // Initialize data pointer
+        builder.alloc_stack("data_ptr", Type::Primitive(PrimitiveType::I32));
+        builder.store(Type::Primitive(PrimitiveType::I32), var("data_ptr"), i32(0));
+
         // Count operations to demonstrate we're processing the AST
         let (cmd_count, loop_count) = self.count_operations(ast);
 
@@ -159,32 +169,26 @@ impl BrainfuckIRBuilder {
                 );
             }
             Command::Output => {
-                // Use the simulated cell value for output
-                let cell_value = if *position < memory.len() { memory[*position] } else { 0 };
+                // Get pointer to current memory cell
+                builder.getelementptr("cell_ptr_out", var("tape"), var("data_ptr"), PrimitiveType::I8);
 
-                // Generate IR that directly uses the cell value
-                builder.binary(
-                    BinaryOp::Add,
-                    "output_val",
-                    PrimitiveType::I8,
-                    i8(cell_value as i8),
-                    i8(0),
-                );
+                // Load the value from memory
+                builder.load("output_val", Type::Primitive(PrimitiveType::I8), var("cell_ptr_out"));
 
                 // Use Lamina's write_byte function for actual output
                 builder.write_byte(var("output_val"), "write_result");
-                
+
                 *output_count += 1;
             }
             Command::Input => {
-                // Simple input simulation without memory access
-                builder.binary(
-                    BinaryOp::Add,
-                    "input_val",
-                    PrimitiveType::I8,
-                    i8(65), // ASCII 'A' as placeholder
-                    i8(0),
-                );
+                // Get pointer to current memory cell using getelem.ptr instruction
+                builder.getelementptr("cell_ptr_in", var("tape"), var("data_ptr"), PrimitiveType::I8);
+
+                // Read byte from stdin using Lamina's readbyte
+                builder.read_byte("input_val");
+
+                // Store the input value to current memory position
+                builder.store(Type::Primitive(PrimitiveType::I8), var("cell_ptr_in"), var("input_val"));
             }
         }
 
