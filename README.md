@@ -48,9 +48,9 @@ Brainfuck is a minimalist, Turing-complete programming language with 8 commands:
 
 ### Prerequisites
 
-- Rust 1.70+ (2024 edition)
+- Rust 1.89+ (2024 edition)
 - GCC or Clang compiler
-- Lamina 0.0.2+
+- Lamina 0.0.5+
 
 ### Build
 
